@@ -1,0 +1,27 @@
+CREATE TRIGGER masks_trigger BEFORE INSERT ON masks FOR EACH ROW
+BEGIN
+  select mask_function(:NEW.mask) into :new.result from dual;
+END;
+
+CREATE TABLE masks 
+(
+    mask varchar2(1000) not null,
+    result varchar2(4000)
+);
+
+
+CREATE FUNCTION mask_function(s IN varchar)
+ BEGIN
+   IF s IS null or 1 >= length(s) >= 1000 
+  THEN
+    dbms_output.put_line('¡the mask number is invalid!');
+ END;
+ FOR i IN 0.. 9 LOOP
+   IF MOD(REPLACE(s,'*',i), 6) = 0 
+     THEN
+         RTA := REPLACE(s,'*',i);
+   END;     
+ END LOOP;
+  RTA := SUBSTR(RTA, 1, LENGTH(RTA) - 1);
+   RETURN RTA;
+ END;
